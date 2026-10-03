@@ -2,12 +2,17 @@ package com.marcus.frotacerta.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.marcus.frotacerta.FrotaCertaApplication
+import com.marcus.frotacerta.ui.contacts.ContactPickerScreen
 import com.marcus.frotacerta.ui.dashboard.DashboardScreen
+import com.marcus.frotacerta.ui.dashboard.DashboardViewModel
+import com.marcus.frotacerta.ui.dashboard.DashboardViewModelFactory
+import com.marcus.frotacerta.ui.rental.NewRentalScreen
 import com.marcus.frotacerta.ui.vehicle.VehicleFormScreen
 import com.marcus.frotacerta.ui.vehicle.VehicleListScreen
 import com.marcus.frotacerta.ui.vehicle.VehicleViewModel
@@ -29,6 +34,12 @@ fun AppNavigation() {
         )
     )
 
+    val dashboardViewModel: DashboardViewModel = viewModel(
+        factory = DashboardViewModelFactory(
+            application.container.rentalRepository
+        )
+    )
+
     NavHost(
         navController = navController,
         startDestination = Routes.DASHBOARD
@@ -39,11 +50,12 @@ fun AppNavigation() {
         ) {
 
             DashboardScreen(
+                viewModel = dashboardViewModel,
                 onOpenVehicles = {
                     navController.navigate(Routes.VEHICLES)
                 },
                 onNewRental = {
-                    // Tela de nova locação será implementada na próxima etapa.
+                    navController.navigate(Routes.NEW_RENTAL)
                 }
             )
         }
@@ -67,6 +79,76 @@ fun AppNavigation() {
             VehicleFormScreen(
                 viewModel = vehicleViewModel,
                 onVehicleSaved = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Routes.NEW_RENTAL
+        ) { backStackEntry ->
+
+            val contactName =
+                backStackEntry
+                    .savedStateHandle
+                    .getStateFlow(
+                        "contact_name",
+                        ""
+                    )
+                    .collectAsStateWithLifecycle()
+
+            val contactPhone =
+                backStackEntry
+                    .savedStateHandle
+                    .getStateFlow(
+                        "contact_phone",
+                        ""
+                    )
+                    .collectAsStateWithLifecycle()
+
+            NewRentalScreen(
+                contactName = contactName.value,
+                contactPhone = contactPhone.value,
+
+                onSelectContact = {
+                    navController.navigate(
+                        Routes.CONTACT_PICKER
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = Routes.CONTACT_PICKER
+        ) {
+
+            ContactPickerScreen(
+                onContactSelected = { contact ->
+
+                    navController
+                        .previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "contact_id",
+                            contact.id
+                        )
+
+                    navController
+                        .previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "contact_name",
+                            contact.name
+                        )
+
+                    navController
+                        .previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            "contact_phone",
+                            contact.phone
+                        )
+
                     navController.popBackStack()
                 }
             )

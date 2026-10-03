@@ -9,4 +9,6 @@ object Routes {
     const val NEW_VEHICLE = "new_vehicle"
 
     const val NEW_RENTAL = "new_rental"
+
+    const val CONTACT_PICKER = "contact_picker"
 }
