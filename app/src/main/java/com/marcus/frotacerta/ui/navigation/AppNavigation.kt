@@ -13,6 +13,8 @@ import com.marcus.frotacerta.ui.dashboard.DashboardScreen
 import com.marcus.frotacerta.ui.dashboard.DashboardViewModel
 import com.marcus.frotacerta.ui.dashboard.DashboardViewModelFactory
 import com.marcus.frotacerta.ui.rental.NewRentalScreen
+import com.marcus.frotacerta.ui.rental.RentalViewModel
+import com.marcus.frotacerta.ui.rental.RentalViewModelFactory
 import com.marcus.frotacerta.ui.vehicle.VehicleFormScreen
 import com.marcus.frotacerta.ui.vehicle.VehicleListScreen
 import com.marcus.frotacerta.ui.vehicle.VehicleViewModel
@@ -37,6 +39,13 @@ fun AppNavigation() {
     val dashboardViewModel: DashboardViewModel = viewModel(
         factory = DashboardViewModelFactory(
             application.container.rentalRepository
+        )
+    )
+
+    val rentalViewModel: RentalViewModel = viewModel(
+        factory = RentalViewModelFactory(
+            rentalRepository = application.container.rentalRepository,
+            vehicleRepository = application.container.vehicleRepository
         )
     )
 
@@ -88,6 +97,15 @@ fun AppNavigation() {
             route = Routes.NEW_RENTAL
         ) { backStackEntry ->
 
+            val contactId =
+                backStackEntry
+                    .savedStateHandle
+                    .getStateFlow(
+                        "contact_id",
+                        -1L
+                    )
+                    .collectAsStateWithLifecycle()
+
             val contactName =
                 backStackEntry
                     .savedStateHandle
@@ -107,6 +125,8 @@ fun AppNavigation() {
                     .collectAsStateWithLifecycle()
 
             NewRentalScreen(
+                viewModel = rentalViewModel,
+                contactId = contactId.value,
                 contactName = contactName.value,
                 contactPhone = contactPhone.value,
 
@@ -114,6 +134,10 @@ fun AppNavigation() {
                     navController.navigate(
                         Routes.CONTACT_PICKER
                     )
+                },
+
+                onRentalCreated = {
+                    navController.popBackStack()
                 }
             )
         }

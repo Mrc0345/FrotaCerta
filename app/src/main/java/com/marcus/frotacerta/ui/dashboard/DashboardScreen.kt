@@ -30,10 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.marcus.frotacerta.data.local.relation.RentalDetails
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -260,27 +261,31 @@ private fun RentalStatus(
 private fun calculateDaysRemaining(
     expectedReturnDate: Long
 ): Long {
+    val today = LocalDate.now()
 
-    val now = System.currentTimeMillis()
+    val returnDate = Instant
+        .ofEpochMilli(expectedReturnDate)
+        .atZone(ZoneOffset.UTC)
+        .toLocalDate()
 
-    val difference =
-        expectedReturnDate - now
-
-    return TimeUnit.MILLISECONDS.toDays(difference)
+    return ChronoUnit.DAYS.between(
+        today,
+        returnDate
+    )
 }
 
 private fun formatDate(
     timestamp: Long
 ): String {
+    val date = Instant
+        .ofEpochMilli(timestamp)
+        .atZone(ZoneOffset.UTC)
+        .toLocalDate()
 
-    val formatter =
-        SimpleDateFormat(
-            "dd/MM/yyyy",
-            Locale("pt", "BR")
-        )
-
-    return formatter.format(
-        Date(timestamp)
+    return "%02d/%02d/%04d".format(
+        date.dayOfMonth,
+        date.monthValue,
+        date.year
     )
 }
 

@@ -6,21 +6,28 @@ import com.marcus.frotacerta.data.repository.ClientRepository
 import com.marcus.frotacerta.data.repository.RentalRepository
 import com.marcus.frotacerta.data.repository.VehicleRepository
 
-class AppContainer(context: Context) {
+class AppContainer(
+    context: Context
+) {
 
-    private val database by lazy {
+    private val database =
         DatabaseProvider.getDatabase(context)
-    }
 
-    val vehicleRepository: VehicleRepository by lazy {
-        VehicleRepository(database.vehicleDao())
-    }
+    val vehicleRepository =
+        VehicleRepository(
+            database.vehicleDao()
+        )
 
-    val clientRepository: ClientRepository by lazy {
-        ClientRepository(database.clientDao())
-    }
+    val clientRepository =
+        ClientRepository(
+            database.clientDao()
+        )
 
-    val rentalRepository: RentalRepository by lazy {
-        RentalRepository(database.rentalDao())
-    }
+    val rentalRepository =
+        RentalRepository(
+            database = database,
+            rentalDao = database.rentalDao(),
+            clientDao = database.clientDao(),
+            vehicleDao = database.vehicleDao()
+        )
 }
