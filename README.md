@@ -302,39 +302,47 @@ Para testar a seleção de clientes em um emulador vazio, cadastre primeiro um c
 
 ---
 
-## 📸 Screenshots
+## 📱 Screenshots
 
-Adicione aqui as capturas das principais telas antes da entrega.
-
-Sugestão de organização:
-
-```text
-docs/screenshots/
-├── dashboard.png
-├── frota.png
-├── novo-veiculo.png
-├── contatos.png
-└── nova-locacao.png
-```
-
-Depois, substitua esta seção pelas imagens:
-
-```md
 ### Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
 
-### Frota
-![Frota](docs/screenshots/frota.png)
+O Dashboard apresenta as locações ativas, informações do veículo e cliente, período da locação, valor estimado e quantidade de dias restantes.
 
-### Cadastro de veículo
-![Cadastro de veículo](docs/screenshots/novo-veiculo.png)
+<p align="center">
+  <img src="screenshots/dashboard.png" width="300">
+</p>
 
-### Seleção de contato
-![Seleção de contato](docs/screenshots/contatos.png)
+### Gestão da Frota
 
-### Nova locação
-![Nova locação](docs/screenshots/nova-locacao.png)
-```
+A tela de frota apresenta os veículos cadastrados e seus respectivos estados, permitindo identificar veículos disponíveis e alugados.
+
+<p align="center">
+  <img src="screenshots/frota.png" width="300">
+</p>
+
+### Seleção de Cliente
+
+Os clientes são obtidos diretamente da agenda de contatos do dispositivo Android utilizando `ContactsContract`. A tela também permite pesquisar contatos pelo nome.
+
+<p align="center">
+  <img src="screenshots/contatos.png" width="300">
+</p>
+
+### Nova Locação
+
+A tela de nova locação permite selecionar cliente, veículo disponível e período da locação. O aplicativo calcula automaticamente a quantidade de diárias e o valor estimado.
+
+<p align="center">
+  <img src="screenshots/nova-locacao.png" width="300">
+</p>
+
+### Integração REST com Retrofit
+
+O aplicativo realiza uma requisição REST real utilizando Retrofit 2. O resultado da comunicação é apresentado no Dashboard.
+
+<p align="center">
+  <img src="screenshots/api.png" width="300">
+</p>
 
 ---
 
