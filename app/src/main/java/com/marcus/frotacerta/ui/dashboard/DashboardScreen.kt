@@ -45,6 +45,7 @@ fun DashboardScreen(
 ) {
 
     val rentals by viewModel.activeRentals.collectAsStateWithLifecycle()
+    val syncState by viewModel.syncState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -53,6 +54,18 @@ fun DashboardScreen(
                     Text("FrotaCerta")
                 },
                 actions = {
+                    TextButton(
+                        onClick = { viewModel.sync() },
+                        enabled = syncState !is SyncUiState.Loading
+                    ) {
+                        Text(
+                            when (syncState) {
+                                is SyncUiState.Loading -> "Sincronizando..."
+                                else -> "Sincronizar API"
+                            }
+                        )
+                    }
+
                     TextButton(
                         onClick = onOpenVehicles
                     ) {
@@ -71,57 +84,99 @@ fun DashboardScreen(
         }
     ) { innerPadding ->
 
-        if (rentals.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Text(
-                    text = "Nenhuma locação ativa",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(
-                    modifier = Modifier.height(8.dp)
-                )
-
-                Text(
-                    text = "As locações em andamento aparecerão aqui.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            when (val state = syncState) {
+                is SyncUiState.Success -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Text(
+                            text = state.message,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                is SyncUiState.Error -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            text = state.message,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                }
+                else -> {}
             }
 
-        } else {
+            if (rentals.isEmpty()) {
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 12.dp,
-                    bottom = 90.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-                items(
-                    items = rentals,
-                    key = {
-                        it.rental.id
-                    }
-                ) { rental ->
-
-                    RentalCard(
-                        details = rental
+                    Text(
+                        text = "Nenhuma locação ativa",
+                        style = MaterialTheme.typography.titleMedium
                     )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Text(
+                        text = "As locações em andamento aparecerão aqui.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+            } else {
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 12.dp,
+                        bottom = 90.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    items(
+                        items = rentals,
+                        key = {
+                            it.rental.id
+                        }
+                    ) { rental ->
+
+                        RentalCard(
+                            details = rental
+                        )
+                    }
                 }
             }
         }

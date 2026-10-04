@@ -38,7 +38,8 @@ fun AppNavigation() {
 
     val dashboardViewModel: DashboardViewModel = viewModel(
         factory = DashboardViewModelFactory(
-            application.container.rentalRepository
+            application.container.rentalRepository,
+            application.container.apiService
         )
     )
 

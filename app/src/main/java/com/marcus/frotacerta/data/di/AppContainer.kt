@@ -2,6 +2,7 @@ package com.marcus.frotacerta.data.di
 
 import android.content.Context
 import com.marcus.frotacerta.data.local.DatabaseProvider
+import com.marcus.frotacerta.data.remote.RetrofitProvider
 import com.marcus.frotacerta.data.repository.ClientRepository
 import com.marcus.frotacerta.data.repository.RentalRepository
 import com.marcus.frotacerta.data.repository.VehicleRepository
@@ -30,4 +31,7 @@ class AppContainer(
             clientDao = database.clientDao(),
             vehicleDao = database.vehicleDao()
         )
+
+    val apiService =
+        RetrofitProvider.api
 }
